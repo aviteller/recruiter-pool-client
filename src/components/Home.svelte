@@ -3,21 +3,21 @@
   import { onMount } from "svelte";
   import config from "../config";
   import Cookies from "../Cookies";
+  import AdminDashboard from "./admin/Dashboard.svelte";
+  import CompanyDashboard from "./company/Dashboard.svelte";
   import {
     mealTypeToString,
-
-
     cookieUser,
     convertDateToAge,
     convertDateToString,
     customFetch
   } from "../helpers";
   import { push } from "svelte-spa-router";
-  // import Meals from "./Meals.svelte";
-  // import Children from "./Children.svelte";
-  // import EatenMeals from "./EatenMeals.svelte";
+
   let c = new Cookies();
+
   let userLoaded = false;
+
   let mode = params.mode || "";
 
   let user = {};
@@ -43,12 +43,14 @@
         if (res.status === 403) {
           logout();
         } else {
-          return res
+          return res;
         }
       })
-      .then(res => {
-        console.log('res :>> ', res.data);
-        user = res.data
+      .then(async res => {
+        user = res.data;
+
+        if (res.data.role === "company") {
+        }
 
         userLoaded = true;
       });
@@ -59,15 +61,14 @@
 
 {#if userLoaded}
 
-  <h1>Hello {user.name}</h1>
-  <h2>user role:{user.role}</h2>
-  <h2>user email:{user.email}</h2>
-  <button on:click={logout}>Logout</button>
-  <br />
-{#if user.role === "admin"}
-  <a href="/#/users">Go to users</a>
-{/if}
+  {#if user.role === 'admin'}
+    <AdminDashboard {user} />
+  {:else if user.role === 'company'}
+    <CompanyDashboard {user} />
 
+  {:else if user.role === 'recruiter'}
+    {user.role}
+  {:else if user.role === 'user'}{user.role}{/if}
 {:else}
   <h1>Loading...</h1>
 {/if}

@@ -1,8 +1,9 @@
 <script>
   import { onMount } from "svelte";
-  import { customFetch } from "../helpers";
-  import Table from "../UI/Table.svelte";
-  import Pagination from "../UI/Pagination.svelte";
+  import { customFetch } from "../../helpers";
+  import Table from "../../UI/Table.svelte";
+  import LoadingSpinner from "../../UI/LoadingSpinner.svelte";
+  import Pagination from "../../UI/Pagination.svelte";
   // import EditUser from "./EditUser.svelte";
   let loaded = false;
   let errors = "";
@@ -83,6 +84,15 @@
       getAllUsers();
     }
   };
+  const restoreUser = async id => {
+    await customFetch(`users/${id}`, {
+      method: "PUT",
+      body: { deleted: false }
+    });
+
+    getAllCompanies();
+  };
+
   const toggleDeleted = () => {
     showDeleted = !showDeleted;
     getAllUsers();
@@ -130,7 +140,18 @@
           <td>{user.email}</td>
           <td>{user.role}</td>
           <td>{user.createdAt}</td>
-          <td><a href={`/#/users/${user._id}`}>edit</a></td>
+          <td>
+            {#if user.deleted}
+              <button
+                on:click={() => {
+                  restoreUser(user._id);
+                }}>
+                restore
+              </button>
+            {:else}
+              <a href={`/#/admin/users/${user._id}`}>edit</a>
+            {/if}
+          </td>
           <td>
             <button
               on:click={() => {
@@ -149,5 +170,5 @@
     </tfoot>
   </Table>
 {:else}
-  <h1>LOADING</h1>
+  <LoadingSpinner />
 {/if}

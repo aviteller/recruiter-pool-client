@@ -1,7 +1,7 @@
 <script>
   export let params = {};
   import { onMount } from "svelte";
-  import { customFetch } from "../helpers";
+  import { customFetch } from "../../helpers";
   let loaded = false;
 
   let user = {

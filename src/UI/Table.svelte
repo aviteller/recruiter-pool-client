@@ -7,8 +7,9 @@
   export let pagination = false;
   export let sortBy = null;
 
-  const setSort = sort => {
+  import SortTab from "./SortTab.svelte";
 
+  const setSort = sort => {
     if (sort.charAt(0) === "-") {
       sortBy = {
         name: sort.slice(1),
@@ -24,10 +25,15 @@
 
   };
 
-  const changeSort = (name, dir) => {
+  const changeSort = e => {
+    console.log('e.detail :>> ', e.detail);
+    let name = e.detail.name;
+    let dir = e.detail.dir;
     dispatch("changesort", { name, dir });
   };
-  onMount(() => setSort(sortBy));
+  onMount(() => {
+    if (sortBy !== null) setSort(sortBy);
+  });
 </script>
 
 <style>
@@ -71,11 +77,11 @@
             {#if sortBy.name === header.name}
               <th colspan={header.col}>
                 >
-                <button
-                  on:click|preventDefault={() => changeSort(header.name, sortBy.dir === 'asc' ? 'desc' : 'asc')}>
-                  {header.name} {sortBy.dir ? 'desc' : 'asc'}
-                </button>
-
+                <SortTab
+                  on:changesort={changeSort}
+                  name={header.name}
+                  dir={sortBy.dir === "desc" ? 'desc' : 'asc'}
+                  active={true} />
               </th>
             {:else}
               <th colspan={header.col}>
@@ -88,17 +94,15 @@
           {:else if header.sortable}
             {#if sortBy.name === header.name}
               <th>
-                <button
-                  on:click|preventDefault={() => changeSort(header.name, sortBy.dir === 'asc' ? 'desc' : 'asc')}>
-                  {header.name} {sortBy.dir === 'asc' ? 'asc' : 'desc'}
-                </button>
+                <SortTab
+                  on:changesort={changeSort}
+                  name={header.name}
+                  dir={sortBy.dir === "desc" ? 'desc' : 'asc'}
+                  active={true} />
               </th>
             {:else}
               <th>
-                <button
-                  on:click|preventDefault={() => changeSort(header.name, 'desc')}>
-                  {header.name}
-                </button>
+                <SortTab on:changesort={changeSort} name={header.name} />
               </th>
             {/if}
           {:else if header.col}

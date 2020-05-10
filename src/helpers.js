@@ -85,3 +85,44 @@ export const customFetch = (endPoint, { body, ...customConfig } = {}) => {
     }
   });
 };
+export const customFetchFileUpload = (endPoint, { body, ...customConfig } = {}) => {
+
+  let authHeader = "";
+
+  if(authHeader = c.getCookie('user-jwt')) {
+    authHeader = `Bearer ${JSON.parse(authHeader).token}`;
+  }
+
+  const headers = {
+    // Accept: "application/json",
+    // "Content-Type": "application/json",
+  };
+
+  if(authHeader != "" ) {
+    headers.Authorization = authHeader
+  }
+
+  const config = {
+    method: body ? "POST" : "GET",
+    credentials: "include",
+    ...customConfig,
+    headers: {
+      ...headers,
+      ...customConfig.headers,
+    },
+  };
+
+  if (body) {
+    config.body = body;
+  }
+
+  return window.fetch(globalConfig.apiUrl + endPoint, config).then(async (res) => {
+    const data = await res.json();
+
+    if (res.ok) {
+      return data;
+    } else {
+      return Promise.reject(data);
+    }
+  });
+};
